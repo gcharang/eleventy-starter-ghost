@@ -8,7 +8,14 @@
     "dev": "cross-env ELEVENTY_ENV=dev eleventy --serve",
     "build": "cross-env ELEVENTY_ENV=prod eleventy",
     "test": "yarn run build",
-    "lint": "eslint . --ext .js --cache"
+    "lint": "eslint . --ext .js --cache",
+    "clean": "rimraf dist",
+    "serve:webpack": "webpack --mode development --watch",
+    "serve:eleventy": "ELEVENTY_ENV=development eleventy --serve",
+    "serve": "npm-run-all clean --parallel serve:*",
+    "build:webpack": "webpack --mode production",
+    "build:eleventy": "ELEVENTY_ENV=production eleventy",
+    "build:dep": "run-s clean build:*"
   },
   "repository": {
     "type": "git",
@@ -37,13 +44,22 @@
     "clean-css": "^4.2.1",
     "cross-env": "^7.0.0",
     "dotenv": "^8.0.0",
-    "eleventy-plugin-lazyimages": "liamfiddler/eleventy-plugin-lazyimages",
+    "eleventy-plugin-lazyimages": "https://github.com/KomodoPlatform/eleventy-plugin-lazyimages#d8fe756a3880d0832044a49a3176644886c29dc7",
     "eleventy-plugin-local-images": "^0.4.0",
     "eslint-utils": "3.0.0",
     "html-minifier": "^4.0.0"
   },
   "devDependencies": {
+    "autoprefixer": "^10.2.6",
+    "css-loader": "^5.2.6",
     "eslint": "7.32.0",
-    "eslint-plugin-ghost": "2.7.0"
+    "eslint-plugin-ghost": "2.7.0",
+    "mini-css-extract-plugin": "^1.6.0",
+    "postcss-loader": "^5.3.0",
+    "rimraf": "^3.0.2",
+    "tailwindcss": "^2.1.4",
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.2",
+    "yarn-run-all": "^3.1.1"
   }
 }

@@ -52,6 +52,7 @@
 
         {{ site.codeinjection_head | safe if site.codeinjection_head }}
         {{ codeinjection_head | safe if codeinjection_head }}
+    <link rel="stylesheet" type="text/css" href="/assets/main.css" />
     </head>
     <body>
         {% include "partials/icons.njk" %}
@@ -75,5 +76,7 @@
             {{ site.codeinjection_foot | safe if site.codeinjection_foot }}
             {{ codeinjection_foot | safe if codeinjection_foot }}
         </div>
+        {{ content | safe }}
+        <script src="/assets/main.js"></script>
     </body>
 </html>
