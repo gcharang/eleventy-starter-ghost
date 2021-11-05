@@ -84,6 +84,28 @@ module.exports = function(eleventyConfig) {
   // Minify HTML
   eleventyConfig.addTransform("htmlmin", htmlMinTransform);
 
+  eleventyConfig.on("afterBuild", async () => {
+    if (process.env.NODE_ENV === "production") {
+      criticalCss();
+    }
+    swBuild(swOptions, config.dir.output).then((res) => console.log(res));
+  });
+
+  if (process.env.NODE_ENV === "production") {
+    //eleventyConfig.addPlugin(lazyImagesPlugin, { preferNativeLazyLoad: true });
+    //
+    eleventyConfig.addPlugin(safeExternalLinks, {
+      pattern: "https{0,1}://", // RegExp pattern for external links
+      noopener: true, // Whether to include noopener
+      noreferrer: false, // Whether to include noreferrer
+      files: [
+        // What output file extensions to work on
+        ".html",
+      ],
+    });
+  }
+
+
   // Assist RSS feed template
   eleventyConfig.addPlugin(pluginRSS);
 
@@ -251,6 +273,21 @@ module.exports = function(eleventyConfig) {
 
     return collection;
   });
+
+
+  eleventyConfig.addFilter("readableDate", (dateObj) => {
+            return DateTime.fromJSDate(dateObj, { zone: "utc" }).toFormat(
+               "dd LLLL yyyy"
+            );
+        });
+    
+  // eleventyConfig.addFilter("htmlDateString", (dateObj) => {
+    //     return DateTime.fromJSDate(dateObj, { zone: "utc" }).toFormat(
+     //         "yyyy-LL-dd"
+    //     );
+    // });
+    
+
 
   // Display 404 page in BrowserSnyc
   eleventyConfig.setBrowserSyncConfig({
