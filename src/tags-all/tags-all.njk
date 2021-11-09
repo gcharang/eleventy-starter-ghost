@@ -1,0 +1,17 @@
+---
+layout: 'layouts/tags.njk'
+pagination:
+  data: collections.tags
+  size: 80
+  alias: tags
+addAllPagesToCollections: true
+---
+
+{% for tag in tags %}
+    {% if 'public' in tag.visibility %}
+        <section class="tags-box">
+            <h3>{{ tag.name }}</h3>
+            {{ tag.count.posts }}
+        </section>
+    {% endif %}
+{% endfor %}

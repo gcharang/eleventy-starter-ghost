@@ -46,13 +46,20 @@
         {%- endblock -%}
 
         {% set css %}{% include "css/styles.css" %}{% endset %}
-        <style>{{ css | cssmin | safe }}</style>
+        <style>
+            {{css | cssmin | safe}}
+        </style>
 
-        <script>document.documentElement.classList.remove('no-js');</script>
+        <script>
+            document
+                .documentElement
+                .classList
+                .remove('no-js');
+        </script>
 
         {{ site.codeinjection_head | safe if site.codeinjection_head }}
         {{ codeinjection_head | safe if codeinjection_head }}
-    <link rel="stylesheet" type="text/css" href="/assets/main.css" />
+        <link rel="stylesheet" type="text/css" href="/assets/main.css"/>
     </head>
     <body>
         {% include "partials/icons.njk" %}
@@ -63,8 +70,7 @@
 
                 <main class="site-main">
                     <div class="container">
-                        {% block content %}
-                        {% endblock content %}
+                        {% block content %}{% endblock content %}
                     </div>
                 </main>
             </div>
@@ -76,7 +82,6 @@
             {{ site.codeinjection_foot | safe if site.codeinjection_foot }}
             {{ codeinjection_foot | safe if codeinjection_foot }}
         </div>
-        {{ content | safe }}
         <script src="/assets/main.js"></script>
     </body>
 </html>

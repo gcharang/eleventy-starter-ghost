@@ -1,5 +1,4 @@
 {% extends 'layouts/default.njk' %}
-{% from "partials/card.njk" import card %}
 
 {% set title = 'Tags' %}
 
@@ -7,6 +6,9 @@
     <header class="tag-header">
         <h1>Tags</h1>
     </header>
+    <section class="post-feed">
+        {{ content | safe }}
+    </section>
 {% endblock %}
 
 {%- block seo -%}

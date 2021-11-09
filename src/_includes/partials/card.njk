@@ -5,7 +5,10 @@
                 <img class="post-card-image" src="{{ post.feature_image }}" alt="{{ post.title }}">
             {% endif %}
             <div class="post-card-tags">
-                {% if post.tags %}{% for tag in post.tags %}{{ tag.name }} {% endfor %}{% endif %}
+                {% if post.tags %}
+                    {% for tag in post.tags %}{{ tag.name }}
+                    {% endfor %}
+                {% endif %}
             </div>
             <h2 class="post-card-title">
                 {{ post.title }}
@@ -17,13 +20,13 @@
         <footer class="post-card-footer">
             <div class="post-card-footer-left">
                 {% if post.primary_author.profile_image %}
-                <div class="post-card-avatar">
-                    <img
+                    <div class="post-card-avatar">
+                        <img
                         class="author-profile-image"
                         src="{{ post.primary_author.profile_image }}"
                         alt="{{ post.primary_author.name }}"
-                    />
-                </div>
+/>
+                    </div>
                 {% endif %}
                 <span>{{ post.primary_author.name }}</span>
             </div>
