@@ -54,7 +54,13 @@ what's here to work the way you'd like it to.
     border: 5px solid gray;
     margin: 0;
 }
-
+.authors-box {
+    max-width: auto;
+    height: auto;
+    padding: 10px;
+    border: 5px solid gray;
+    margin: 0;
+}
 html,
 body,
 div,

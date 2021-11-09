@@ -1,0 +1,20 @@
+---
+pagination:
+  data: collections.authors
+  size: 6
+  alias: authors
+  addAllPagesToCollections: true
+layout: 'layouts/author.njk'
+---
+{% for author in authors %}
+    <section class="authors-box">
+        {% if author.profile_image %}
+            <figure class="post-feature-image">
+                <img src="{{ author.profile_image }}" alt="{{ author.title }}">
+            </figure>
+        {% endif %}
+        <h3>{{ author.name }}</h3>
+
+        {{ author.posts.length }} Posts
+    </section>
+{% endfor %}

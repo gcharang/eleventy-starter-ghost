@@ -4,9 +4,13 @@
 {% set title = author.name %}
 
 {% block content %}
-    {% include "partials/author-header.njk" %}
-
+    <header class="tag-header">
+        <h1>Author</h1>
+    </header>
     <section class="post-feed">
+        {{ content | safe }}
+    </section>
+    {# <section class="post-feed">
         {% if author.posts %}
             {% for post in author.posts %}
                 {{ card(post) }}
@@ -14,7 +18,7 @@
         {% else %}
             <p>No posts to be found</p>
         {% endif %}
-    </section>
+    </section> #}
 {% endblock %}
 
 {%- block seo -%}
