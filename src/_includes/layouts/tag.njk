@@ -1,21 +1,13 @@
 {% extends 'layouts/default.njk' %}
-{% from "partials/card.njk" import card %}
 
-{% set title = tag.name %}
+{% set title = 'Tags' %}
 
 {% block content %}
     <header class="tag-header">
-        <h1>{{ tag.name }}</h1>
-        <p>{{ content | safe }}</p>
+        <h1>Tagsss</h1>
     </header>
     <section class="post-feed">
-        {% if tag.posts %}
-            {% for post in tag.posts %}
-                {{ card(post) }}
-            {% endfor %}
-        {% else %}
-            <p>No posts to be found</p>
-        {% endif %}
+        {{ content | safe }}
     </section>
 {% endblock %}
 

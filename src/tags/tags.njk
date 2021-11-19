@@ -1,12 +1,28 @@
 ---
-layout: 'layouts/tags.njk'
+layout: 'layouts/tag.njk'
 pagination:
   data: collections.tags
   size: 80
   alias: tags
 addAllPagesToCollections: true
+permalink: '/tag/{{tag.slug}}'
 ---
 
+{# <section class="post-feed">
+        {% for tag in tags %}
+            {{ card(tag) }}
+        {% endfor %}
+    </section>
+
+    {% include "partials/pagination.njk" %} #}
+{% for tag in tags %}
+    {% if 'public' in tag.visibility %}
+        {# {{ tag | stringify}} #}
+        {{ tag.slug }}
+    {% endif %}
+{% endfor %}
+
+{#
 {% for tag in tags %}
     {% if 'public' in tag.visibility %}
         <a href={{ tag.url }} target="_blank" rel="noopener noreferrer">
@@ -16,4 +32,4 @@ addAllPagesToCollections: true
             </section>
         </a>
     {% endif %}
-{% endfor %}
+{% endfor %} #}

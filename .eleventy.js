@@ -108,18 +108,18 @@ module.exports = function (eleventyConfig) {
     eleventyConfig.addPlugin(pluginRSS);
 
     // Apply performance attributes to images
-    eleventyConfig.addPlugin(lazyImages, {
-        cacheFile: "",
-    });
+    // eleventyConfig.addPlugin(lazyImages, {
+    //     cacheFile: "",
+    // });
 
-    // Copy images over from Ghost
-    eleventyConfig.addPlugin(localImages, {
-        distPath: "dist",
-        assetPath: "/assets/images",
-        selector: "img",
-        attribute: "data-src", // Lazy images attribute
-        verbose: false,
-    });
+    // // Copy images over from Ghost
+    // eleventyConfig.addPlugin(localImages, {
+    //     distPath: "dist",
+    //     assetPath: "/assets/images",
+    //     selector: "img",
+    //     attribute: "data-src", // Lazy images attribute
+    //     verbose: false,
+    // });
 
     // Inline CSS
     eleventyConfig.addFilter("cssmin", (code) => {
