@@ -41,7 +41,14 @@ module.exports = async function() {
         for(let i = 0; i*postsPerPage < taggedPosts.length; i++){
             let postSet = {};
             postSet.posts = taggedPosts.slice( postsPerPage*(i) , postsPerPage*(i+1));
+            postSet.tagName = tag.name;
             postSet.url = (i > 0) ? tag.slug + `/${i}/` : tag.slug + "/";
+            if(i==0){
+                postSet.isFirstPage = true;
+            }
+            if( (i+1)*postsPerPage > taggedPosts.length ){
+                postSet.isLastPage = true;
+            }
             tagPostsCollection.push(postSet);
         }
     })

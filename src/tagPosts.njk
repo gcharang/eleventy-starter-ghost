@@ -9,7 +9,7 @@ permalink: "tags/{{ postSet.url }}"
 {% extends 'layouts/default.njk' %}
 {% from "partials/card.njk" import card %}
 
-{% set title = "tagss" %}
+{% set title = postSet.tagName %}
 
 {% block content %}
     <section class="post-feed">
@@ -18,5 +18,18 @@ permalink: "tags/{{ postSet.url }}"
         {% endfor %}
     </section>
 
-    {% include "partials/pagination.njk" %}
+    {% if pagination.previousPageHref or pagination.nextPageHref %}
+    <nav class="pagination" role="pagination">
+        {% if page.permalink != pagination.previousPageHref and not postSet.isFirstPage %}
+            <a href="{{ pagination.previousPageHref }}">Prev page</a>
+        {% else %}
+            <span>Prev page</span>
+        {% endif %}
+        {% if page.permalink != pagination.nextPageHref  and not postSet.isLastPage %}
+            <a href="{{ pagination.nextPageHref }}">Next page</a>
+        {% else %}
+            <span>Next page</span>
+        {% endif %}
+    </nav>
+{% endif %}
 {% endblock%}
