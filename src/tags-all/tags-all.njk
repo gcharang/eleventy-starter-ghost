@@ -5,13 +5,14 @@ pagination:
   size: 80
   alias: tags
 addAllPagesToCollections: true
+permalink: "tags/"
 ---
 
 {% for tag in tags %}
     {% if 'public' in tag.visibility %}
-        <section class="tags-box">
+        <a href = "/tags/{{tag.slug}}/"><section class="tags-box">
             <h3>{{ tag.name }}</h3>
             {{ tag.count.posts }}
-        </section>
+        </section></a>
     {% endif %}
 {% endfor %}
