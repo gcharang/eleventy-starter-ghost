@@ -108,10 +108,37 @@ module.exports = function (eleventyConfig) {
     eleventyConfig.addPlugin(pluginRSS);
 
     // Apply performance attributes to images
-    eleventyConfig.addPlugin(lazyImages, {
-        cacheFile: "",
-    });
+    // eleventyConfig.addPlugin(lazyImages, {
+    //     cacheFile: "",
+    // });
 
+    eleventyConfig.addPlugin(lazyImages, {
+        //cacheFile: "", //TODO: Remove this option for prod
+        transformImgPath: (src, options = {}) => {
+            if (src.startsWith("/en/blog")) {
+                return "https://komodoplatform.com" + src;
+            }
+            if (
+                src.startsWith("./") ||
+                src.startsWith("../") ||
+                (!src.startsWith("/") &&
+                    !src.startsWith("http://") &&
+                    !src.startsWith("https://") &&
+                    !src.startsWith("data:"))
+            ) {
+                // The file path is relative to the output document
+                const outputDir = path.posix.parse(options.inputPath).dir;
+                return path.posix.normalize(outputDir + "/" + src);
+            }
+
+            // Reference files from the root project directory
+            if (src.startsWith("/") && !src.startsWith("//")) {
+                return `.${src}`;
+            }
+
+            return src;
+        },
+    });
     // Copy images over from Ghost
     eleventyConfig.addPlugin(localImages, {
         distPath: "dist",
