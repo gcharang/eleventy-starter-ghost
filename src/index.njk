@@ -11,11 +11,13 @@ pagination:
 {% set title = "Posts" %}
 
 {% block content %}
-    <section class="post-feed">
+    <script defer src="/scripts/loadPosts.js"></script>
+    <section class="post-feed" id="post-feed-all">
         {% for post in posts %}
             {{ card(post) }}
         {% endfor %}
     </section>
+    <button style = "text-align:center;" id ="loadPosts">Load more</button>
 
-    {% include "partials/pagination.njk" %}
+    {# {% include "partials/pagination.njk" %} #}
 {% endblock%}

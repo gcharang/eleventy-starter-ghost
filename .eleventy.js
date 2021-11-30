@@ -31,6 +31,21 @@ const stripDomain = (url) => {
     return url.replace(process.env.GHOST_API_URL, "");
 };
 
+const createPostsJsonData = (collection) => {
+    const postsPerLoad = 7;
+    collection[collection.length - 1].isLastPost = true;
+    fs.mkdirSync('./dist/data/posts/allPosts', { recursive: true }, (err) => {
+        if (err) throw err;
+      });
+    for(let i=0 ; i * postsPerLoad < collection.length ; i++){
+        jsonData = JSON.stringify(collection.slice( postsPerLoad * i , postsPerLoad * (i+1)), null, 2);
+        fs.writeFileSync(`./dist/data/posts/allPosts/${i}.json`, jsonData, (err) =>{
+            if(err) throw err;
+            console.log(`Written to JSON file: ${i+1}th part`);            
+        });
+    }    
+}
+
 module.exports = function (eleventyConfig) {
     const dirToClean = path.join(config.dir.output, "*");
     del.sync(dirToClean, { dot: true });
@@ -80,6 +95,9 @@ module.exports = function (eleventyConfig) {
             },
         ],
     };
+
+    eleventyConfig.addPassthroughCopy("src/scripts");
+
     // Minify HTML
     eleventyConfig.addTransform("htmlmin", htmlMinTransform);
 
@@ -228,6 +246,10 @@ module.exports = function (eleventyConfig) {
 
         // Bring featured post to the top of the list
         collection.sort((post, nextPost) => nextPost.featured - post.featured);
+
+        createPostsJsonData(collection);
+
+        collection = collection.slice(0,7);
 
         return collection;
     });
