@@ -2,7 +2,7 @@
     <a class="post-card{% if post.featured %}  post-card-featured{% endif %}" href="{{ post.url }}">
         <header class="post-card-header">
             {% if post.feature_image %}
-                <img class="post-card-image" src="{{ post.feature_image }}" alt="{{ post.title }}">
+                <img class="post-card-image" src="{{ post.feature_image | correctImgURL }}" alt="{{ post.title }}">
             {% endif %}
             <div class="post-card-tags">
                 {% if post.tags %}

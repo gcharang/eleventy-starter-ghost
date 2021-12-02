@@ -34,17 +34,25 @@ const stripDomain = (url) => {
 const createPostsJsonData = (collection) => {
     const postsPerLoad = 7;
     collection[collection.length - 1].isLastPost = true;
-    fs.mkdirSync('./dist/data/posts/allPosts', { recursive: true }, (err) => {
+    fs.mkdirSync("./dist/data/posts/allPosts", { recursive: true }, (err) => {
         if (err) throw err;
-      });
-    for(let i=0 ; i * postsPerLoad < collection.length ; i++){
-        jsonData = JSON.stringify(collection.slice( postsPerLoad * i , postsPerLoad * (i+1)), null, 2);
-        fs.writeFileSync(`./dist/data/posts/allPosts/${i}.json`, jsonData, (err) =>{
-            if(err) throw err;
-            console.log(`Written to JSON file: ${i+1}th part`);            
-        });
-    }    
-}
+    });
+    for (let i = 0; i * postsPerLoad < collection.length; i++) {
+        jsonData = JSON.stringify(
+            collection.slice(postsPerLoad * i, postsPerLoad * (i + 1)),
+            null,
+            2
+        );
+        fs.writeFileSync(
+            `./dist/data/posts/allPosts/${i}.json`,
+            jsonData,
+            (err) => {
+                if (err) throw err;
+                console.log(`Written to JSON file: ${i + 1}th part`);
+            }
+        );
+    }
+};
 
 module.exports = function (eleventyConfig) {
     const dirToClean = path.join(config.dir.output, "*");
@@ -126,9 +134,9 @@ module.exports = function (eleventyConfig) {
     eleventyConfig.addPlugin(pluginRSS);
 
     // Apply performance attributes to images
-    // eleventyConfig.addPlugin(lazyImages, {
-    //     cacheFile: "",
-    // });
+    eleventyConfig.addPlugin(lazyImages, {
+        cacheFile: "",
+    });
 
     eleventyConfig.addPlugin(lazyImages, {
         //cacheFile: "", //TODO: Remove this option for prod
@@ -173,6 +181,13 @@ module.exports = function (eleventyConfig) {
 
     eleventyConfig.addFilter("stringify", (input) => {
         return JSON.stringify(input);
+    });
+
+    eleventyConfig.addFilter("correctImgURL", (input) => {
+        if (input.startsWith("/en/blog")) {
+            return "https://komodoplatform.com" + input;
+        }
+        return input;
     });
 
     eleventyConfig.addFilter("getReadingTime", (text) => {
@@ -249,7 +264,7 @@ module.exports = function (eleventyConfig) {
 
         createPostsJsonData(collection);
 
-        collection = collection.slice(0,7);
+        collection = collection.slice(0, 7);
 
         return collection;
     });
