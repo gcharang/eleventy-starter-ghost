@@ -1,23 +1,19 @@
----
-pagination:
-  data: collections.posts
-  size: 7
-  alias: posts
----
-
 {% extends 'layouts/default.njk' %}
 {% from "partials/card.njk" import card %}
 
 {% set title = "Posts" %}
+{% set posts = collections.posts|arrSlice(0,7) %}
 
 {% block content %}
     <script defer src="/scripts/loadPosts.js"></script>
-    <section class="post-feed" id="post-feed-all">
+    <section class="post-feed" id="post-feed-all" data-load-count = "1">
         {% for post in posts %}
             {{ card(post) }}
         {% endfor %}
     </section>
-    <button style = "text-align:center;" id ="loadPosts">Load more</button>
+    {% if not (posts | last).isLastPost %}
+        <button style = "text-align:center;" id ="loadPosts">Load more</button>
+    {% endif %}
 
     {# {% include "partials/pagination.njk" %} #}
 {% endblock%}

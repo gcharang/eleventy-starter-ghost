@@ -48,15 +48,14 @@ function generateCardHTML(post) {
     return cardHTML;
 }
 
-async function loadMorePosts() {
-    if (!sessionStorage.getItem("postSetLoadCount")) {
-        sessionStorage.setItem("postSetLoadCount", 1);
-    }
-    postSetLoadCount = parseInt(sessionStorage.getItem("postSetLoadCount"));
+async function loadMorePosts(postFeedId, dataURI, buttonId) {
+    let postFeedSection = document.getElementById(postFeedId);
+
+    let postSetLoadCount = parseInt(postFeedSection.getAttribute("data-load-count"));
     let posts = [];
     try {
         let response = await fetch(
-            `/data/posts/allPosts/${postSetLoadCount}.json`
+            `${dataURI}${postSetLoadCount}.json`
         );
         posts = await response.json();
     } catch (error) {
@@ -64,15 +63,38 @@ async function loadMorePosts() {
     }
 
     if (posts.length && posts[posts.length - 1].isLastPost) {
-        document.getElementById("loadPosts").setAttribute("hidden", true);
+        document.getElementById(buttonId).setAttribute("hidden", true);
     }
     let postsHTML = "";
     posts.forEach((post, index) => {
         postsHTML += generateCardHTML(post);
     });
-    allPostsSection = document.getElementById("post-feed-all");
-    allPostsSection.insertAdjacentHTML("beforeend", postsHTML);
-    sessionStorage.setItem("postSetLoadCount", postSetLoadCount + 1);
+    postFeedSection.insertAdjacentHTML("beforeend", postsHTML);
+    postFeedSection.setAttribute("data-load-count", postSetLoadCount + 1);
 }
 
-document.getElementById("loadPosts").addEventListener("click", loadMorePosts);
+async function loadMoreHomePosts(event){
+    await loadMorePosts("post-feed-all", "/data/posts/allPosts/", "loadPosts");
+}
+
+async function loadMoreTagPosts(event){
+    const tagSlug = event.target.name.slice(13);
+    const dataURI = `/data/posts/tagPosts/${tagSlug}/`;
+    await loadMorePosts("tag-post-feed", dataURI, "loadTagPosts");
+}
+
+async function loadMoreAuthorPosts(event){
+    const authorSlug = event.target.name.slice(16);
+    const dataURI = `/data/posts/authorPosts/${authorSlug}/`;
+    await loadMorePosts("author-post-feed", dataURI, "loadAuthorPosts");
+}
+
+if(document.getElementById("loadPosts")){
+    document.getElementById("loadPosts").addEventListener("click", loadMoreHomePosts);
+}
+if(document.getElementById("loadTagPosts")){
+    document.getElementById("loadTagPosts").addEventListener("click", loadMoreTagPosts);
+}
+if(document.getElementById("loadAuthorPosts")){
+    document.getElementById("loadAuthorPosts").addEventListener("click", loadMoreAuthorPosts);
+}

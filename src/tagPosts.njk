@@ -1,35 +1,24 @@
 ---
 pagination:
-  data: tagPostsCollection
+  data: collections.tags
   size: 1
-  alias: postSet
-permalink: "tags/{{ postSet.url }}"
+  alias: tag
+permalink: "{{ tag.url }}"
 ---
 
 {% extends 'layouts/default.njk' %}
 {% from "partials/card.njk" import card %}
 
-{% set title = postSet.tagName %}
+{% set title = tag.name %}
 
 {% block content %}
-    <section class="post-feed">
-        {% for post in postSet.posts %}
+    <script defer src="/scripts/loadPosts.js"></script>
+    <section class="post-feed" id="tag-post-feed" data-load-count="1">
+        {% for post in tag.posts | arrSlice(0,7) %}
             {{ card(post) }}
         {% endfor %}
     </section>
-
-    {% if pagination.previousPageHref or pagination.nextPageHref %}
-    <nav class="pagination" role="pagination">
-        {% if page.permalink != pagination.previousPageHref and not postSet.isFirstPage %}
-            <a href="{{ pagination.previousPageHref }}">Prev page</a>
-        {% else %}
-            <span>Prev page</span>
-        {% endif %}
-        {% if page.permalink != pagination.nextPageHref  and not postSet.isLastPage %}
-            <a href="{{ pagination.nextPageHref }}">Next page</a>
-        {% else %}
-            <span>Next page</span>
-        {% endif %}
-    </nav>
-{% endif %}
+    {% if not ( (tag.posts | arrSlice(0,7)) | last).isLastPost %}
+        <button style = "text-align:center;" id = "loadTagPosts" name = "loadTagPosts-{{tag.slug}}">Load more</button>
+    {% endif %}
 {% endblock%}

@@ -1,0 +1,26 @@
+---
+pagination:
+  data: collections.authors
+  size: 1
+  alias: author
+permalink: "{{ author.url }}"
+---
+
+
+{% extends 'layouts/default.njk' %}
+{% from "partials/card.njk" import card %}
+
+{% set title = author.name %}
+
+{% block content %}
+    <script defer src="/scripts/loadPosts.js"></script>
+    {# Author intro section to be inserted #}
+    <section class="post-feed" id="author-post-feed" data-load-count="1">
+        {% for post in author.posts | arrSlice(0,7) %}
+            {{ card(post) }}
+        {% endfor %}
+    </section>
+    {% if not ( (author.posts | arrSlice(0,7)) | last).isLastPost %}
+        <button style = "text-align:center;" id = "loadAuthorPosts" name = "loadAuthorPosts-{{author.slug}}">Load more</button>
+    {% endif %}
+{% endblock%}

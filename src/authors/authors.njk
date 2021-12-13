@@ -7,14 +7,16 @@ pagination:
 layout: 'layouts/author.njk'
 ---
 {% for author in authors %}
-    <section class="authors-box">
-        {% if author.profile_image %}
-            <figure class="post-feature-image">
-                <img src="{{ author.profile_image }}" alt="{{ author.title }}">
-            </figure>
-        {% endif %}
-        <h3>{{ author.name }}</h3>
+    <a href = "{{author.url}}">
+        <section class="authors-box">
+            {% if author.profile_image %}
+                <figure class="post-feature-image">
+                    <img src="{{ author.profile_image }}" alt="{{ author.title }}">
+                </figure>
+            {% endif %}
+            <h3>{{ author.name }}</h3>
 
-        {{ author.posts.length }} Posts
-    </section>
+            {{ author.posts.length }} Posts
+        </section>
+    </a>
 {% endfor %}

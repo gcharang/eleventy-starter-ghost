@@ -26,17 +26,26 @@ const config = {
     },
 };
 
+const CONSTANTS = {
+    initialPostCount: 7,
+    postsPerLoad: 7
+}
+
 // Strip Ghost domain from urls
 const stripDomain = (url) => {
     return url.replace(process.env.GHOST_API_URL, "");
 };
 
-const createPostsJsonData = (collection) => {
-    const postsPerLoad = 7;
+const createPostsJsonData = ( collection, targetDir ) => {
+    const postsPerLoad = CONSTANTS.postsPerLoad;
     collection[collection.length - 1].isLastPost = true;
-    fs.mkdirSync("./dist/data/posts/allPosts", { recursive: true }, (err) => {
-        if (err) throw err;
-    });
+
+    if( !fs.existsSync(targetDir) ){
+        fs.mkdirSync( targetDir, { recursive: true }, (err) => {
+            if (err) throw err;
+        });
+    }
+
     for (let i = 0; i * postsPerLoad < collection.length; i++) {
         jsonData = JSON.stringify(
             collection.slice(postsPerLoad * i, postsPerLoad * (i + 1)),
@@ -44,7 +53,7 @@ const createPostsJsonData = (collection) => {
             2
         );
         fs.writeFileSync(
-            `./dist/data/posts/allPosts/${i}.json`,
+            `${targetDir}/${i}.json`,
             jsonData,
             (err) => {
                 if (err) throw err;
@@ -53,6 +62,24 @@ const createPostsJsonData = (collection) => {
         );
     }
 };
+
+const createTagPostsJsonData = (collection) => {
+    collection.forEach( tag => {
+        const targetDir = `./dist/data/posts/tagPosts/${tag.slug}`;
+        if(tag.posts && tag.posts.length > 0){
+            createPostsJsonData( tag.posts, targetDir);
+        }
+    });
+}
+
+const createAuthorPostsJsonData = (collection) => {
+    collection.forEach( author => {
+        const targetDir = `./dist/data/posts/authorPosts/${author.slug}`;
+        if(author.posts && author.posts.length > 0){
+            createPostsJsonData( author.posts, targetDir);
+        }
+    });
+}
 
 module.exports = function (eleventyConfig) {
     const dirToClean = path.join(config.dir.output, "*");
@@ -134,9 +161,9 @@ module.exports = function (eleventyConfig) {
     eleventyConfig.addPlugin(pluginRSS);
 
     // Apply performance attributes to images
-    eleventyConfig.addPlugin(lazyImages, {
-        cacheFile: "",
-    });
+    // eleventyConfig.addPlugin(lazyImages, {
+    //     cacheFile: "",
+    // });
 
     eleventyConfig.addPlugin(lazyImages, {
         //cacheFile: "", //TODO: Remove this option for prod
@@ -165,6 +192,7 @@ module.exports = function (eleventyConfig) {
             return src;
         },
     });
+
     // Copy images over from Ghost
     eleventyConfig.addPlugin(localImages, {
         distPath: "dist",
@@ -215,6 +243,11 @@ module.exports = function (eleventyConfig) {
         return new Date(dateObj).toISOString().split("T")[0];
     });
 
+    // Array slice filter
+    eleventyConfig.addNunjucksFilter("arrSlice", (arr, from, to) => {
+        return arr.slice(from,to);
+    })
+
     // Get all pages, called 'docs' to prevent
     // conflicting the eleventy page object
     eleventyConfig.addCollection("docs", async function (collection) {
@@ -253,7 +286,16 @@ module.exports = function (eleventyConfig) {
         collection.forEach((post) => {
             post.url = stripDomain(post.url);
             post.primary_author.url = stripDomain(post.primary_author.url);
-            post.tags.map((tag) => (tag.url = stripDomain(tag.url)));
+
+            // Seperate internal(Hash) tags from end-user tags
+            post.internalTags = [];
+            post.tags = post.tags.filter((tag) => {
+                tag.url = stripDomain(tag.url);
+                if( tag.name.startsWith("#") ){
+                    post.internalTags.push(tag);
+                }
+                return !tag.name.startsWith("#");
+            });
 
             // Convert publish date into a Date object
             post.published_at = new Date(post.published_at);
@@ -262,10 +304,14 @@ module.exports = function (eleventyConfig) {
         // Bring featured post to the top of the list
         collection.sort((post, nextPost) => nextPost.featured - post.featured);
 
-        createPostsJsonData(collection);
-
-        collection = collection.slice(0, 7);
-
+        if(collection.length <= CONSTANTS.initialPostCount){
+            collection[ collection.length - 1 ].isLastPost = true;
+        }
+        else{        
+        // Create JSON data for Loading more posts
+        createPostsJsonData( collection, "./dist/data/posts/allPosts" );
+        }
+        
         return collection;
     });
 
@@ -282,7 +328,7 @@ module.exports = function (eleventyConfig) {
         // Get all posts with their authors attached
         const posts = await api.posts
             .browse({
-                include: "authors",
+                include: "authors,tags",
                 limit: "all",
             })
             .catch((err) => {
@@ -293,12 +339,22 @@ module.exports = function (eleventyConfig) {
         collection.forEach(async (author) => {
             const authorsPosts = posts.filter((post) => {
                 post.url = stripDomain(post.url);
+                //Remove internal tags
+                post.tags = post.tags.filter( tag => !tag.name.startsWith("#") );
                 return post.primary_author.id === author.id;
             });
             if (authorsPosts.length) author.posts = authorsPosts;
 
+            if(author.posts && author.posts.length <= CONSTANTS.initialPostCount){
+                author.posts[ author.posts.length - 1 ].isLastPost = true;
+            }
+
             author.url = stripDomain(author.url);
         });
+
+        collection = collection.filter( author => author.posts && author.posts.length > 0);
+
+        createAuthorPostsJsonData(collection);
 
         return collection;
     });
@@ -323,17 +379,32 @@ module.exports = function (eleventyConfig) {
             .catch((err) => {
                 console.error(err);
             });
+        
+        //Remove internal tags from collection
+        collection = collection.filter(tag => !tag.name.startsWith("#"));
 
         // Attach posts to their respective tags
-        collection.forEach(async (tag) => {
+        collection.forEach( tag => {
             const taggedPosts = posts.filter((post) => {
                 post.url = stripDomain(post.url);
+                post.tags = post.tags.filter(postTag => !postTag.name.startsWith("#"));
                 return post.primary_tag && post.primary_tag.slug === tag.slug;
             });
             if (taggedPosts.length) tag.posts = taggedPosts;
 
+            if(tag.posts && tag.posts.length <= CONSTANTS.initialPostCount){
+                tag.posts[ tag.posts.length - 1 ].isLastPost = true;
+            }
+
             tag.url = stripDomain(tag.url);
+            if(tag.url == "/404/"){
+                tag.url = `/tag/${tag.slug}/`;
+            }
         });
+
+        collection = collection.filter( tag => tag.posts && tag.posts.length > 0);
+
+        createTagPostsJsonData(collection);
 
         return collection;
     });

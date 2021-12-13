@@ -10,9 +10,11 @@ permalink: "tags/"
 
 {% for tag in tags %}
     {% if 'public' in tag.visibility %}
-        <a href = "/tags/{{tag.slug}}/"><section class="tags-box">
-            <h3>{{ tag.name }}</h3>
-            {{ tag.count.posts }}
-        </section></a>
+        <a href = "{{tag.url}}">
+            <section class="tags-box">
+                <h3>{{ tag.name }}</h3>
+                {{ tag.posts.length }}
+            </section>
+        </a>
     {% endif %}
 {% endfor %}
